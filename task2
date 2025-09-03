@@ -1,0 +1,56 @@
+import pandas as pd
+from fpdf import FPDF
+
+# Read CSV file
+df = pd.read_csv("students.csv")
+
+# Basic statistics
+average_cgpa = df["CGPA"].mean()
+highest_cgpa = df["CGPA"].max()
+lowest_cgpa = df["CGPA"].min()
+top_students = df[df["CGPA"] == highest_cgpa]["Name"].tolist()
+
+# PDF Report Generation
+class PDFReport(FPDF):
+    def header(self):
+        self.set_font("Arial", "B", 14)
+        self.cell(0, 10, "Student CGPA Report", ln=True, align="C")
+        self.ln(10)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("Arial", "I", 8)
+        self.cell(0, 10, f"Page {self.page_no()}", align="C")
+
+    def add_summary(self, avg, high, low, top_students):
+        self.set_font("Arial", "", 12)
+        self.cell(0, 10, f"Average CGPA: {avg:.2f}", ln=True)
+        self.cell(0, 10, f"Highest CGPA: {high:.2f}", ln=True)
+        self.cell(0, 10, f"Lowest CGPA: {low:.2f}", ln=True)
+        self.cell(0, 10, f"Top Student(s): {', '.join(top_students)}", ln=True)
+        self.ln(10)
+
+    def add_student_table(self, df):
+        self.set_font("Arial", "B", 12)
+        self.cell(0, 10, "Student List", ln=True)
+        self.ln(5)
+
+        self.set_font("Arial", "B", 10)
+        self.cell(100, 10, "Name", border=1)
+        self.cell(40, 10, "CGPA", border=1)
+        self.ln()
+
+        self.set_font("Arial", "", 10)
+        for _, row in df.iterrows():
+            self.cell(100, 10, row["Name"], border=1)
+            self.cell(40, 10, f"{row['CGPA']:.2f}", border=1)
+            self.ln()
+
+# Create PDF
+pdf = PDFReport()
+pdf.add_page()
+pdf.add_summary(average_cgpa, highest_cgpa, lowest_cgpa, top_students)
+pdf.add_student_table(df)
+pdf.output("cgpa_report.pdf")
+
+print("PDF report generated: cgpa_report.pdf")
