@@ -13,3 +13,5 @@ DURATION - 4 WEEKS
 BATCH - AG22
 
 OUTPUT:
+
+[cgpa_report.pdf](https://github.com/user-attachments/files/22139535/cgpa_report.pdf)
